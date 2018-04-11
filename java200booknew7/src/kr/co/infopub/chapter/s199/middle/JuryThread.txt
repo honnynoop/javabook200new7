@@ -1,0 +1,292 @@
+001: package kr.co.infopub.chapter.s199.middle;
+002: import java.io.*;
+003: import java.net.*;
+004: import java.util.*;
+005: import kr.co.infopub.chapter.s199.common.DepCountDto;
+006: import kr.co.infopub.chapter.s199.common.DepartmentDto;
+007: import kr.co.infopub.chapter.s199.common.EmployeeDto;
+008: import kr.co.infopub.chapter.s199.common.HRMRequest;
+009: import java.sql.*;
+010: public class JuryThread extends Thread {
+011:    EmployeeService    activeDB;
+012:    Socket             talkToMe;
+013:    ObjectOutputStream sendStream;
+014:    ObjectInputStream  recvStream;
+015:    boolean            success = true;
+016:    HRMRequest            command;
+017:    /*
+018:    ProtocolHandler로부터 Socket를 넘겨받아 ObjectOutput, InputStream를 연다.
+019:    run() 메소드에서는 클라이언트에서 넘겨주는 HRMRequest객체를 받고 주도록 쓰레드를 start한다.
+020:    */
+021:    public JuryThread(Socket s, EmployeeService activeDB){
+022:       talkToMe  = s;
+023:       System.out.println(talkToMe.getInetAddress()+"이 붙음");
+024:    this.activeDB  = activeDB;
+025:    try{
+026:      sendStream = new ObjectOutputStream(talkToMe.getOutputStream());
+027:      recvStream = new ObjectInputStream(talkToMe.getInputStream());
+028:      start();
+029:    }catch(IOException e){ 
+030:      System.err.println("Error- JuryThread 생성자");
+031:          success = false;
+032:          close();
+033:       }
+034:    }
+035:    public void close(){
+036: 	   try{
+037:            if(recvStream!=null )recvStream.close();
+038:            if(sendStream!=null )sendStream.close();
+039:            if(talkToMe!=null )talkToMe.close();
+040:         }catch(IOException ioe){ }
+041:    }
+042:    /*
+043:    run() 메소드에서는 클라이언트에서 넘겨주는 HRMRequest객체를 받아들여서 
+044:    상수값으로 표현된 규약를 읽고 switch에서 각각을 판단하며 EmployeeService객체의 
+045:    메소드를 호출한다. 그리고 그 메소드에서 발생할 exception을 catch 하면서 status에 
+046:    -1, -2등등을 셋팅하면서 다시 클라이언트에 HRMRequest객체를 넘겨준다. 
+047:    클라이언트에서 넘어온 HRMRequest객체중에 값을 갖고 있는 경우는 직렬화객체형태로 넘어
+048:    오기때문에 그것을 받아서 메소드의 argument에 넣어주면서 처리하고, 클라이언트로 보낼 경우에는
+049:   HRMRequest객체에 있는 HRMResponse객체에 add시키면서 보낸다.
+050:    */
+051:  public void run() {
+052:   while (success) {
+053:   try {
+054:     command = (HRMRequest)recvStream.readObject();//먼저 읽고
+055:   }catch(Exception e) {
+056: 	close();
+057: 	System.err.println ("클라이언트 연결이 끊어짐.......");
+058:     return;
+059:   }
+060:   try{
+061: 	System.out.println("5 request 받음, protocol :"+command.getCommandValue());
+062: 	// HRMRequest에 있는 프로토콜에 대한 판단과 처리를 한다.
+063: 	// 클아이언트에서 요청은 프로토콜로 날아온다.
+064:     switch(command.getCommandValue()){
+065: 	 case HRMRequest.findAllDepartments: {       // 2010 요청받음
+066: 		// DB에서 사원이 있는 모든 부서 리스트로 가져온다.
+067: 		List<DepartmentDto> cr =  activeDB.findAllDepartments();
+068: 		  if(cr.size() <= 0){
+069: 			 System.err.println("Error in findAllDepartments"); 
+070: 			 command.getResult().setStatus(-1);
+071: 		  }else{
+072: 			 // 정사적으로 요청을 처리하면 결과를 HRMRequest내부의
+073: 			 // HRMResponse객체에 저장한다. HRMResponse는 Vector
+074: 			 command.getResult().add(cr);
+075: 			 command.getResult().setStatus(0);
+076: 		  }
+077: 	    } break;
+078: 	case HRMRequest.findTreeManagerInEmployee: {
+079: 		List<EmployeeDto> cr =  activeDB.findTreeManagerInEmployee();
+080: 		  if(cr.size() <= 0){
+081: 			 System.err.println("Error in findTreeManagerInEmployee"); 
+082: 			 command.getResult().setStatus(-2);
+083: 		  }else{
+084: 			 command.getResult().add(cr);
+085: 			 command.getResult().setStatus(0);
+086: 		  }
+087: 	    } break;
+088: 	case HRMRequest.findAllEmployees: {
+089: 		List<EmployeeDto> cr =  activeDB.findAllEmployees();
+090: 		  if(cr.size() <= 0){
+091: 			 System.err.println("Error in findAllEmployees"); 
+092: 			 command.getResult().setStatus(-3);
+093: 		  }else{
+094: 			 command.getResult().add(cr);
+095: 			 command.getResult().setStatus(0);
+096: 		  }
+097: 	    } break;
+098: 	case HRMRequest.getTreeMaxLevel: {
+099: 		int cr =  activeDB.getTreeMaxLevel();
+100: 		  if(cr <= 0){
+101: 			 System.err.println("Error in getTreeMaxLevel"); 
+102: 			 command.getResult().setStatus(-4);
+103: 		  }else{
+104: 			 command.getResult().add(cr);
+105: 			 command.getResult().setStatus(0);
+106: 		  }
+107: 	    } break;
+108: 	case HRMRequest.findAllDepCounts: {
+109: 		List<DepCountDto> cr =  activeDB.findAllDepCounts();
+110: 		  if(cr.size() <= 0){
+111: 			 System.err.println("Error in findAllDepCounts"); 
+112: 			 command.getResult().setStatus(-5);
+113: 		  }else{
+114: 			 command.getResult().add(cr);
+115: 			 command.getResult().setStatus(0);
+116: 		  }
+117: 	    } break;
+118: 	case HRMRequest.findEmployeesByDepartName: {
+119: 		String val="";
+120: 		Serializable objs=command.getRequestObject();
+121: 		if(objs!=null && objs instanceof String){
+122: 			val=(String)objs;
+123: 		}
+124: 		List<EmployeeDto> cr =  activeDB.findEmployeesByDepartName(val);
+125: 		  if(cr.size() <= 0){
+126: 			 System.err.println("Error in findEmployeesByDepartName"); 
+127: 			 command.getResult().setStatus(-6);
+128: 			 //return;
+129: 		  }else{
+130: 			 command.getResult().add(cr);
+131: 			 command.getResult().setStatus(0);
+132: 		  }
+133: 	    } break;
+134: 	case HRMRequest.findEmployeesByEmpId: {
+135: 		String val="";
+136: 		Serializable objs=command.getRequestObject();
+137: 		if(objs!=null && objs instanceof String){
+138: 			val=(String)objs;
+139: 		}
+140: 		List<EmployeeDto> cr =  activeDB.findEmployeesByEmpId(val);
+141: 		  if(cr.size() <= 0){
+142: 			 System.err.println("Error in findEmployeesByEmpId"); 
+143: 			 command.getResult().setStatus(-7);
+144: 			 //return;
+145: 		  }else{
+146: 			 command.getResult().add(cr);
+147: 			 command.getResult().setStatus(0);
+148: 		  }
+149: 	    } break;
+150: 	case HRMRequest.findEmployeeById: {
+151: 		String val="";
+152: 		Serializable objs=command.getRequestObject();
+153: 		if(objs!=null && objs instanceof String){
+154: 			val=(String)objs;
+155: 		}
+156: 		EmployeeDto cr =  activeDB.findEmployeeById(val);
+157: 		  if(cr==null){
+158: 			 System.err.println("Error in findEmployeeById"); 
+159: 			 command.getResult().setStatus(-8);
+160: 			 return;
+161: 		  }else{
+162: 			 command.getResult().add(cr);
+163: 			 command.getResult().setStatus(0);
+164: 		  }
+165: 	    } break;
+166: 	case HRMRequest.findManagersByName: {
+167: 		String val="";
+168: 		Serializable objs=command.getRequestObject();
+169: 		if(objs!=null && objs instanceof String){
+170: 			val=(String)objs;
+171: 		}
+172: 		List<EmployeeDto> cr =  activeDB.findManagersByName(val);
+173: 		  if(cr.size() <= 0){
+174: 			 System.err.println("Error in findEmployeeById"); 
+175: 			 command.getResult().setStatus(-9);
+176: 		  }else{
+177: 			 command.getResult().add(cr);
+178: 			 command.getResult().setStatus(0);
+179: 		  }
+180: 	    } break;
+181: 	case HRMRequest.findAllJobs: {
+182: 		List<String> cr =  activeDB.findAllJobs();
+183: 		  if(cr.size() <= 0){
+184: 			 System.err.println("Error in findAllJobs"); 
+185: 			 command.getResult().setStatus(-10);
+186: 		  }else{
+187: 			 command.getResult().add(cr);
+188: 			 command.getResult().setStatus(0);
+189: 		  }
+190: 	    } break;
+191: 	case HRMRequest.findAllDepartments2: {
+192: 		List<DepartmentDto> cr =  activeDB.findAllDepartments2();
+193: 		  if(cr.size() <= 0){
+194: 			 System.err.println("Error in findAllDepartments2"); 
+195: 			 command.getResult().setStatus(-11);
+196: 		  }else{
+197: 			 command.getResult().add(cr);
+198: 			 command.getResult().setStatus(0);
+199: 		  }
+200: 	    } break;
+201: 	case HRMRequest.addEmployee: {
+202: 		EmployeeDto val=null;
+203: 		Serializable objs=command.getRequestObject();
+204: 		if(objs!=null && objs instanceof EmployeeDto){
+205: 			val=(EmployeeDto)objs;
+206: 		}else{
+207: 			System.err.println("Error in addEmployee"); 
+208: 			command.getResult().setStatus(-12);
+209: 			return;
+210: 		}
+211: 		int cr =  activeDB.addEmployee(val);
+212: 		  if(cr==0){
+213: 			 System.err.println("Error in addEmployee"); 
+214: 			 command.getResult().setStatus(-13);
+215: 		  }else{
+216: 			 command.getResult().add(cr);
+217: 			 command.getResult().setStatus(0);
+218: 		  }
+219: 	    } break;
+220: 	case HRMRequest.updateEmployee: {
+221: 		EmployeeDto val=null;
+222: 		Serializable objs=command.getRequestObject();
+223: 		if(objs!=null && objs instanceof EmployeeDto){
+224: 			val=(EmployeeDto)objs;
+225: 		}else{
+226: 			System.err.println("Error in updateEmployee"); 
+227: 			command.getResult().setStatus(-14);
+228: 			return;
+229: 		}
+230: 		boolean cr =  activeDB.updateEmployee(val);
+231: 		  if(cr==false){
+232: 			 System.err.println("Error in updateEmployee"); 
+233: 			 command.getResult().setStatus(-15);
+234: 		  }else{
+235: 			 command.getResult().add(cr);
+236: 			 command.getResult().setStatus(0);
+237: 		  }
+238: 	    } break;
+239: 	case HRMRequest.deleteEmployee: {
+240: 		EmployeeDto val=null;
+241: 		Serializable objs=command.getRequestObject();
+242: 		if(objs!=null && objs instanceof EmployeeDto){
+243: 			val=(EmployeeDto)objs;
+244: 		}else{
+245: 			System.err.println("Error in deleteEmployee"); 
+246: 			command.getResult().setStatus(-16);
+247: 			return;
+248: 		}
+249: 		boolean cr =  activeDB.deleteEmployee(val);
+250: 		  if(cr==false){
+251: 			 System.err.println("Error in deleteEmployee"); 
+252: 			 command.getResult().setStatus(-17);
+253: 		  }else{
+254: 			 command.getResult().add(cr);
+255: 			 command.getResult().setStatus(0);
+256: 		  }
+257: 	    } break;
+258: 	case HRMRequest.getEmployeesTotal: {
+259: 		int cr =  activeDB.getEmployeesTotal();
+260: 		  if(cr <= 0){
+261: 			 System.err.println("Error in getEmployeesTotal"); 
+262: 			 command.getResult().setStatus(-18);
+263: 		  }else{
+264: 			 command.getResult().add(cr);
+265: 			 command.getResult().setStatus(0);
+266: 		  }
+267: 	    } break;
+268:     default:
+269:        // 잘못된 프로토콜을 받았을 때
+270:        command.getResult().setStatus(-19);break;
+271:     }
+272:    }catch(Exception e){
+273:       System.err.println ("Error in JuryThread's switch");
+274:       // 그외 JuryThread의 switch 처리하다 발생
+275:       command.getResult().setStatus(-20);
+276:    }
+277:    // 클라이언트 요청를 처리한 결과를 HRMRequest에 담아 클라이언로 재전송
+278:    // 클라이언트로 보내는 HRMRequest에 HRMResponse가 있다 
+279:    // 결국 HRMResponse를 클라이언트로 전송
+280:    try {
+281:       sendStream.writeObject(command);
+282:       sendStream.flush();
+283:       System.out.println("6 response 보냄: "+command.getResult().getStatus());
+284:    }catch(Exception e){
+285:       System.err.println("Error in writing response");
+286:    }
+287:    // 다른 JuryThread에게 양보(이 쓰레드는 요청을 끝냈으니)
+288:    // 멀티 client -> 멀티 JuryThread
+289:    Thread.yield(); 
+290:   }
+291:  }
+292: }

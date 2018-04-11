@@ -1,0 +1,105 @@
+001: package kr.co.infopub.chapter.s200.client;
+002: import java.io.IOException;
+003: import java.sql.SQLException;
+004: import java.util.List;
+005: import javafx.collections.ObservableList;
+006: import kr.co.infopub.chapter.s199.common.DepCountDto;
+007: import kr.co.infopub.chapter.s199.common.DepartmentDto;
+008: import kr.co.infopub.chapter.s199.common.EmployeeDto;
+009: import kr.co.infopub.chapter.s200.dto.DepConvert;
+010: import kr.co.infopub.chapter.s200.dto.DepCount;
+011: import kr.co.infopub.chapter.s200.dto.DepCountConvert;
+012: import kr.co.infopub.chapter.s200.dto.Department;
+013: import kr.co.infopub.chapter.s200.dto.EmpConvert;
+014: import kr.co.infopub.chapter.s200.dto.Employee;
+015: public class EmployeeService { 
+016:  // 자신을 private static 
+017:  private static EmployeeService employeeService;
+018:  private static HRMProtocol employeeDAO; 
+019:  // 생성자도 private
+020:  private EmployeeService() {
+021: 	try {
+022: 		employeeDAO=new HRMProtocol("127.0.0.1");
+023: 	} catch (IOException e) {
+024: 		close();
+025: 	}
+026:  }
+027:  public void close(){
+028: 	try {
+029: 		employeeDAO.close();
+030: 	} catch (IOException e1) {
+031: 		System.out.println("socket Error ~~~~~ ");
+032: 	}
+033:  }
+034:  // static -> 한번의 객체생성 
+035:  public static EmployeeService getInstance(){
+036: 	if(employeeService==null){
+037: 		employeeService=new EmployeeService();
+038: 	}
+039: 	return employeeService;
+040:  }//--------------DAO를 감싸고, List -> ObservableList
+041:  public ObservableList<Department> 
+042:                      findAllDepartments() throws SQLException{
+043: 	List<DepartmentDto> blist=employeeDAO.findAllDepartments();
+044: 	return DepConvert.toObservProFromDto(blist);
+045:  }
+046:  public ObservableList<Employee> findAllEmployees() throws SQLException{
+047: 	List<EmployeeDto> blist  = employeeDAO.findAllEmployees ();
+048: 	return EmpConvert.toObservProFromDto(blist);
+049:  }
+050:  public ObservableList<Employee> findTreeManagerInEmployee()
+051: 		                                            throws SQLException{
+052: 	List<EmployeeDto> bdlists= employeeDAO.findTreeManagerInEmployee();
+053:     return EmpConvert.toObservProFromDto(bdlists);
+054:  }
+055:  public int getTreeMaxLevel() throws SQLException{
+056: 	 return  employeeDAO.getTreeMaxLevel();
+057:  }
+058:  public ObservableList<DepCount> findAllDepCounts() throws SQLException{
+059:     List<DepCountDto> deplist = employeeDAO.findAllDepCounts();
+060:     return DepCountConvert.toObservProFromDto(deplist);
+061:  }
+062:  public ObservableList<Employee> 
+063:           findEmployeesByDepartName(String val) throws SQLException{
+064: 	 List<EmployeeDto> emplists=
+065: 			               employeeDAO.findEmployeesByDepartName(val);
+066: 	 return EmpConvert.toObservProFromDto(emplists);
+067:  }
+068:  public ObservableList<Employee> 
+069:                  findEmployeesByEmpId(String val) throws SQLException{
+070:   List<EmployeeDto> elists=employeeDAO.findEmployeesByEmpId(val);//100
+071: 	return EmpConvert.toObservProFromDto(elists);
+072:  }
+073:  public Employee findEmployeeById(String string) throws SQLException{
+074: 	EmployeeDto edto =employeeDAO.findEmployeeById(string);
+075: 	return EmpConvert.toPro(edto);
+076:  }
+077:  public ObservableList<Employee> 
+078:             findManagersByName(String searchname) throws SQLException{
+079: 	List<EmployeeDto> elists=employeeDAO.findManagersByName(searchname);
+080: 	return EmpConvert.toObservProFromDto(elists);
+081:  }
+082:  public ObservableList<String> findAllJobs() throws SQLException{
+083:     List<String> jlists=employeeDAO.findAllJobs();
+084: 	return EmpConvert.strList(jlists);
+085:  }
+086:  public ObservableList<Department>
+087:                            findAllDepartments2() throws SQLException{
+088:     List<DepartmentDto> edeps=employeeDAO.findAllDepartments2 ();
+089: 	return DepConvert.toObservProFromDto(edeps);
+090:  }
+091:  public int addEmployee(EmployeeDto empdto) throws SQLException{
+092: 	return employeeDAO.addEmployee(empdto);
+093:  }
+094:  public boolean updateEmployee(Employee emp) throws SQLException{
+095: 	EmployeeDto edot=EmpConvert.toDto(emp);
+096: 	return employeeDAO.updateEmployee(edot);
+097:  }
+098:  public boolean deleteEmployee(Employee emp) throws SQLException{
+099: 	EmployeeDto edot=EmpConvert.toDto(emp);
+100: 	return employeeDAO.deleteEmployee(edot);
+101:  }
+102:  public int getEmployeesTotal() throws SQLException{
+103: 	return employeeDAO.getEmployeesTotal();
+104:  }
+105: }

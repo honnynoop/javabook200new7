@@ -1,0 +1,21 @@
+01: package kr.co.infopub.chapter.s200.client;
+02: import java.io.IOException;
+03: import java.sql.SQLException;
+04: import java.util.List;
+05: 
+06: import kr.co.infopub.chapter.s199.common.EmployeeDto;
+07: public class ProtocolTest {
+08: 	public static void main(String[] args) {
+09: 		try {
+10: 			HRMProtocol pro=new HRMProtocol("127.0.0.1");
+11: 			List<EmployeeDto> emps= pro.findTreeManagerInEmployee();
+12: 			for (EmployeeDto emp:emps) {
+13: 				System.out.println(emp);
+14: 			}
+15: 		} catch (IOException e) {
+16: 			System.out.println(e);
+17: 		} catch (SQLException e) {
+18: 			System.out.println(e);
+19: 		}
+20: 	}
+21: }

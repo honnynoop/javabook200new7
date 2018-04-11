@@ -1,0 +1,93 @@
+01: package kr.co.infopub.chapter.s191.model;
+02: import java.sql.SQLException;
+03: import java.util.List;
+04: import javafx.collections.ObservableList;
+05: import kr.co.infopub.chapter.s191.dto.DepConvert;
+06: import kr.co.infopub.chapter.s191.dto.DepCount;
+07: import kr.co.infopub.chapter.s191.dto.DepCountConvert;
+08: import kr.co.infopub.chapter.s191.dto.DepCountDto;
+09: import kr.co.infopub.chapter.s191.dto.Department;
+10: import kr.co.infopub.chapter.s191.dto.DepartmentDto;
+11: import kr.co.infopub.chapter.s191.dto.EmpConvert;
+12: import kr.co.infopub.chapter.s191.dto.EmployeeDto;
+13: import kr.co.infopub.chapter.s191.dto.Employee;
+14: public class EmployeeService { 
+15:  // 자신을 private static 
+16:  private static EmployeeService employeeService;
+17:  private static EmployeeDAO employeeDAO; 
+18:  // 생성자도 private
+19:  private EmployeeService() {
+20: 	employeeDAO=new EmployeeDAO();
+21:  }
+22:  // static -> 한번의 객체생성 
+23:  public static EmployeeService getInstance(){
+24: 	if(employeeService==null){
+25: 		employeeService=new EmployeeService();
+26: 	}
+27: 	return employeeService;
+28:  }//--------------DAO를 감싸고, List -> ObservableList
+29:  public ObservableList<Department> 
+30:                      findAllDepartments() throws SQLException{
+31: 	List<DepartmentDto> blist=employeeDAO.findAllDepartments();
+32: 	return DepConvert.toObservProFromDto(blist);
+33:  }
+34:  public ObservableList<Employee> 
+35:           findEmployeesByDepartName(String val) throws SQLException{
+36: 	 List<EmployeeDto> emplists=
+37: 			               employeeDAO.findEmployeesByDepartName(val);
+38: 	 return EmpConvert.toObservProFromDto(emplists);
+39:  }
+40:  public ObservableList<Employee> findAllEmployees() throws SQLException{
+41: 	List<EmployeeDto> blist  = employeeDAO.findAllEmployees ();
+42: 	return EmpConvert.toObservProFromDto(blist);
+43:  }
+44:  public ObservableList<Employee> 
+45:                       findTreeManagerInEmployee() throws SQLException{
+46: 	 List<EmployeeDto> bdlists= employeeDAO.findTreeManagerInEmployee();
+47: 	 return EmpConvert.toObservProFromDto(bdlists);
+48:  }
+49:  public int getTreeMaxLevel() throws SQLException{
+50: 	return  employeeDAO.getTreeMaxLevel();
+51:  }
+52:  public ObservableList<Employee> 
+53:                  findEmployeesByEmpId(String val) throws SQLException{
+54:   List<EmployeeDto> elists=employeeDAO.findEmployeesByEmpId(val);//100
+55: 	return EmpConvert.toObservProFromDto(elists);
+56:  }
+57:  public Employee findEmployeeById(String string) throws SQLException{
+58: 	EmployeeDto edto =employeeDAO.findEmployeeById(string);
+59: 	return EmpConvert.toPro(edto);
+60:  }
+61:  public ObservableList<Employee> 
+62:             findManagersByName(String searchname) throws SQLException{
+63: 	List<EmployeeDto> elists=employeeDAO.findManagersByName(searchname);
+64: 	return EmpConvert.toObservProFromDto(elists);
+65:  }
+66:  public ObservableList<String> findAllJobs() throws SQLException{
+67:     List<String> jlists=employeeDAO.findAllJobs();
+68: 	return EmpConvert.strList(jlists);
+69:  }
+70:  public ObservableList<Department>
+71:                            findAllDepartments2() throws SQLException{
+72:     List<DepartmentDto> edeps=employeeDAO.findAllDepartments2 ();
+73: 	return DepConvert.toObservProFromDto(edeps);
+74:  }
+75:  public int addEmployee(EmployeeDto empdto) throws SQLException{
+76: 	return employeeDAO.addEmployee(empdto);
+77:  }
+78:  public boolean updateEmployee(Employee emp) throws SQLException{
+79: 	EmployeeDto edot=EmpConvert.toDto(emp);
+80: 	return employeeDAO.updateEmployee(edot);
+81:  }
+82:  public boolean deleteEmployee(Employee emp) throws SQLException{
+83: 	EmployeeDto edot=EmpConvert.toDto(emp);
+84: 	return employeeDAO.deleteEmployee(edot);
+85:  }
+86:  public ObservableList<DepCount> findAllDepCounts() throws SQLException{
+87:     List<DepCountDto> deplist = employeeDAO.findAllDepCounts();
+88:     return DepCountConvert.toObservProFromDto(deplist);
+89:  }
+90:  public int getEmployeesTotal() throws SQLException{
+91: 	return employeeDAO.getEmployeesTotal();
+92:  }
+93: }

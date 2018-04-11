@@ -1,0 +1,652 @@
+001: package kr.co.infopub.chapter.s191.model;
+002: import java.sql.Connection;
+003: import java.sql.PreparedStatement;
+004: import java.sql.ResultSet;
+005: import java.sql.SQLException;
+006: import java.util.ArrayList;
+007: import java.util.List;
+008: 
+009: import kr.co.infopub.chapter.s191.dto.DepCountDto;
+010: import kr.co.infopub.chapter.s191.dto.DepartmentDto;
+011: import kr.co.infopub.chapter.s191.dto.EmployeeDto;
+012: 
+013: public class EmployeeDAO extends DataBase{
+014: 	 public  int getEmployeesTotal () throws SQLException {
+015: 	        String SQL = " SELECT COUNT(*) FROM EMPLOYEES ";
+016: 	        Connection conn=null;
+017: 	        PreparedStatement psmt=null;
+018: 	        ResultSet rs=null;
+019: 	        int count=0;
+020: 	        try {
+021: 	            conn=getConnection();
+022: 	            psmt=conn.prepareStatement(SQL);
+023: 	            log("3/6 getEmployeesTotal Success!!!");
+024: 	            log(SQL,"getEmployeesTotal");
+025: 	            rs =psmt.executeQuery();
+026: 	            log("4/6 getEmployeesTotal Success!!!");
+027: 	           
+028: 	            if (rs.next()) {
+029: 	                count=rs.getInt(1);  
+030: 	            }
+031: 	            log("5/6 getEmployeesTotal Success!!!");
+032: 	        } catch (SQLException e) {
+033: 	        	log(" getEmployeesTotal Error!!!",e);
+034: 	        	throw e;
+035: 	        }finally{
+036: 	        	close(conn, psmt, rs);
+037: 	        }
+038: 	        return count;
+039: 	    }
+040: 
+041: 	  public  List<DepartmentDto> findAllDepartments () throws SQLException {
+042: 
+043: 	        String SQL=""+
+044: 	          " SELECT NVL(E.DEPARTMENT_ID,0) DEPARTMENT_ID, NVL(D.DEPARTMENT_NAME,'NOTYET') DEPARTMENT_NAME            "
+045: 	         +" FROM EMPLOYEES E, DEPARTMENTS D            "
+046: 	         +" WHERE E.DEPARTMENT_ID=D.DEPARTMENT_ID(+)            " 
+047: 	         +" GROUP BY E.DEPARTMENT_ID, D.DEPARTMENT_NAME            "
+048: 	         +" ORDER BY E.DEPARTMENT_ID            ";
+049: 
+050: 	        Connection conn=null;
+051: 	        PreparedStatement psmt=null;
+052: 	        ResultSet rs=null;
+053: 	        List<DepartmentDto> empList = new ArrayList<>();
+054: 	        //List<DepartmentDto> empList = FXCollections.observableArrayList();
+055: 	        try {
+056: 	        	 conn=getConnection();
+057: 	             psmt=conn.prepareStatement(SQL);
+058: 	             log(SQL,"findAllDepartments");
+059: 	             log("3/6 findAllDepartments Success!!!");
+060: 	             rs =psmt.executeQuery();
+061: 	             log("4/6 findAllDepartments Success!!!");
+062: 	             while (rs.next()) {
+063: 	            	 DepartmentDto emp = new DepartmentDto();
+064: 	                 emp.setDepartment_id(rs.getInt("DEPARTMENT_id"));
+065: 	                 emp.setDepartment_name(rs.getString("DEPARTMENT_name"));
+066: 	                 empList.add(emp);
+067: 	             }
+068: 	             log("5/6 findAllDepartments Success!!!");
+069: 	        } catch (SQLException e) {
+070: 	        	log(" findAllDepartments Error!!!",e);
+071: 	        	throw e;
+072: 	        }finally{
+073: 	        	close(conn, psmt, rs);
+074: 	        }
+075: 	        return empList;
+076: 	    }
+077: 	  public  List<DepartmentDto> findAllDepartments2 () throws SQLException {
+078: 
+079: 	        String SQL=""+
+080: 			 " SELECT  NVL(D.DEPARTMENT_ID,0) DEPARTMENT_ID,            "
+081: 			+" NVL(D.DEPARTMENT_NAME,'NOTYET') DEPARTMENT_NAME         "
+082: 			+" FROM EMPLOYEES E FULL OUTER JOIN  DEPARTMENTS D         "
+083: 			+" ON E.DEPARTMENT_ID=D.DEPARTMENT_ID                      "
+084: 			+" GROUP BY D.DEPARTMENT_ID,D.DEPARTMENT_NAME              "
+085: 			+" ORDER BY D.DEPARTMENT_ID                                ";
+086: 	        Connection conn=null;
+087: 	        PreparedStatement psmt=null;
+088: 	        ResultSet rs=null;
+089: 	       // ObservableList<Department> empList = FXCollections.observableArrayList();
+090: 	        List<DepartmentDto> empList = new ArrayList<>();
+091: 	        try {
+092: 	        	 conn=getConnection();
+093: 	             psmt=conn.prepareStatement(SQL);
+094: 	             log(SQL,"findAllDepartments");
+095: 	             log("3/6 findAllDepartments Success!!!");
+096: 	             rs =psmt.executeQuery();
+097: 	             log("4/6 findAllDepartments Success!!!");
+098: 	             while (rs.next()) {
+099: 	            	 DepartmentDto emp = new DepartmentDto();
+100: 	                 emp.setDepartment_id(rs.getInt("DEPARTMENT_id"));
+101: 	                 emp.setDepartment_name(rs.getString("DEPARTMENT_name"));
+102: 	                 empList.add(emp);
+103: 	             }
+104: 	             log("5/6 findAllDepartments Success!!!");
+105: 	        } catch (SQLException e) {
+106: 	        	log(" findAllDepartments Error!!!",e);
+107: 	        	throw e;
+108: 	        }finally{
+109: 	        	close(conn, psmt, rs);
+110: 	        }
+111: 	        return empList;
+112: 	    }
+113: 	  public  List<DepCountDto> findAllDepCounts ()   throws SQLException{
+114: 	        String SQL = ""
+115: 	        		+" SELECT COUNT(*) COUNT, NVL(E.DEPARTMENT_ID,0) DEPARTMENT_ID,        "
+116: 	        		+"         NVL(D.DEPARTMENT_NAME,'NOTYET') DEPARTMENT_NAME             "
+117: 	        		+" FROM EMPLOYEES E, DEPARTMENTS D                                     "
+118: 	        		+" WHERE E.DEPARTMENT_ID=D.DEPARTMENT_ID(+)                            "
+119: 	        		+" GROUP BY E.DEPARTMENT_ID, D.DEPARTMENT_NAME                         "
+120: 	        		+" ORDER BY COUNT DESC,E.DEPARTMENT_ID ASC                             ";
+121: 	        Connection conn=null;
+122: 	        PreparedStatement psmt=null;
+123: 	        ResultSet rs=null;
+124: 	        List<DepCountDto> empList = new ArrayList<>();
+125: 	        //List<DepCount> empList = FXCollections.observableArrayList();
+126: 	        try {
+127: 	        	 conn=getConnection();
+128: 	             psmt=conn.prepareStatement(SQL);
+129: 	             log("3/6 findAllDepCounts Success!!!");
+130: 	             log(SQL,"findAllDepCounts");
+131: 	             rs =psmt.executeQuery();
+132: 	             log("4/6 findAllDepCounts Success!!!");
+133: 	             while (rs.next()) {
+134: 	            	 DepCountDto emp = new DepCountDto();
+135: 	                 emp.setCount(rs.getInt("COUNT"));
+136: 	                 emp.setDepartment_id(rs.getInt("DEPARTMENT_ID"));
+137: 	                 emp.setDepartment_name(rs.getString("DEPARTMENT_NAME"));
+138: 	                 empList.add(emp);
+139: 	             }
+140: 	             log("5/6 findAllDepCounts Success!!!");
+141: 	        } catch (SQLException e) {
+142: 	        	log(" findAllDepCounts Error !!!",e);
+143: 	        	throw e;
+144: 	        }finally{
+145: 	        	close(conn, psmt, rs);
+146: 	        }
+147: 	        return empList;
+148: 	    }
+149: 	  
+150: 	  //-------------------------------------emp
+151: 	  public  List<EmployeeDto> findAllEmployees ()  throws SQLException{
+152: 
+153: 	        String SQL = " SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL,                   "
+154: 	        		+ " PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY , COMMISSION_PCT,              "
+155: 	        		+"  MANAGER_ID, DEPARTMENT_ID FROM EMPLOYEES ORDER BY EMPLOYEE_ID          ";
+156: 	        Connection conn=null;
+157: 	        PreparedStatement psmt=null;
+158: 	        ResultSet rs=null;
+159: 	        List<EmployeeDto> empList = new ArrayList<>();
+160: 	        try {
+161: 	        	 conn=getConnection();
+162: 	             psmt=conn.prepareStatement(SQL);
+163: 	             log("3/6 findAllEmployees Success!!!");
+164: 	             log(SQL,"findAllEmployees");
+165: 	             rs =psmt.executeQuery();
+166: 	             log("4/6 findAllEmployees Success!!!");
+167: 	             while (rs.next()) {
+168: 	            	 EmployeeDto emp = new EmployeeDto();
+169: 	                 emp.setEmployeeId(rs.getInt("EMPLOYEE_ID"));
+170: 	                 emp.setFirstName(rs.getString("FIRST_NAME"));
+171: 	                 emp.setLastName(rs.getString("LAST_NAME"));
+172: 	                 emp.setEmail(rs.getString("EMAIL"));
+173: 	                 emp.setPhoneNumber(rs.getString("PHONE_NUMBER"));
+174: 	                 emp.setHireDate(rs.getDate("HIRE_DATE"));
+175: 	                 emp.setJobId(rs.getString("JOB_ID"));
+176: 	                 emp.setSalary(rs.getInt("SALARY"));
+177: 	                 emp.setCommissionPct(rs.getDouble("COMMISSION_PCT"));
+178: 	                 emp.setManagerId(rs.getInt("MANAGER_ID"));
+179: 	                 emp.setDepartmantId(rs.getInt("DEPARTMENT_ID"));
+180: 	                 empList.add(emp);
+181: 	             }
+182: 	             log("5/6 findAllEmployees Success!!!");
+183: 	        } catch (SQLException e) {
+184: 	        	log(" findAllEmployees Error !!!",e);
+185: 	        	throw e;
+186: 	        }finally{
+187: 	        	close(conn, psmt, rs);
+188: 	        }
+189: 	        return empList;
+190: 	    }
+191: 	  public  List<EmployeeDto> findTreeManagerInEmployee ()  throws SQLException{
+192: 	        String SQL = ""
+193: 				        +" SELECT                   "
+194: 				    	+" EMPLOYEE_ID,             "
+195: 				    	+" MANAGER_ID,              "
+196: 				    	+" FIRST_NAME,              "
+197: 				    	+" LAST_NAME, DEPARTMENT_ID, ORDER2              "
+198: 				    	+" FROM ( 	SELECT                      "
+199: 				    	+" 				EMPLOYEE_ID,            "
+200: 				    	+" 				MANAGER_ID,             "
+201: 				    	+" 				FIRST_NAME,             "
+202: 				    	+" 				LAST_NAME, DEPARTMENT_ID, LEVEL ,             "
+203: 				    	+" 				SYS_CONNECT_BY_PATH(TO_CHAR(LEVEL,'FM000')||EMPLOYEE_ID,'/') ORDER2             "
+204: 					    +"   			FROM EMPLOYEES              "
+205: 					    +"  			START WITH  MANAGER_ID  IS NULL             "
+206: 					    +"  			CONNECT BY PRIOR  EMPLOYEE_ID = MANAGER_ID)             "
+207: 					    +"  ORDER BY ORDER2  ";
+208: 	        Connection conn=null;
+209: 	        PreparedStatement psmt=null;
+210: 	        ResultSet rs=null;
+211: 	        List<EmployeeDto> empList = new ArrayList<>();
+212: 	        try {
+213: 	        	 conn=getConnection();
+214: 	             psmt=conn.prepareStatement(SQL);
+215: 	             log("3/6 findTreeManagerInEmployee Success!!!");
+216: 	             log(SQL,"findTreeManagerInEmployee");
+217: 	             rs =psmt.executeQuery();
+218: 	             log("4/6 findTreeManagerInEmployee Success!!!");
+219: 	             while (rs.next()) {
+220: 	            	 EmployeeDto emp = new EmployeeDto();
+221: 	                 emp.setEmployeeId(rs.getInt("EMPLOYEE_ID"));
+222: 	                 emp.setManagerId(rs.getInt("MANAGER_ID"));
+223: 	                 emp.setFirstName(rs.getString("FIRST_NAME"));
+224: 	                 emp.setLastName(rs.getString("LAST_NAME"));
+225: 	                 emp.setDepartmantId(rs.getInt("DEPARTMENT_ID"));
+226: 	                 emp.setOrder2(rs.getString("ORDER2"));
+227: 	                 empList.add(emp);
+228: 	             }
+229: 	             log("5/6 findTreeManagerInEmployee Success!!!");
+230: 	        } catch (SQLException e) {
+231: 	        	 log(" findTreeManagerInEmployee Error!!!",e);
+232: 	        	 throw e;
+233: 	        }finally{
+234: 	        	close(conn, psmt, rs);
+235: 	        }
+236: 	        return empList;
+237: 	    }
+238: 	  public  int getTreeMaxLevel () throws SQLException {
+239: 
+240: 	    	String SQL = ""
+241: 	         		+" SELECT MAX(LEVEL)                         "
+242: 	         		+" FROM EMPLOYEES                            "
+243: 	         		+" START WITH  MANAGER_ID  IS NULL           "
+244: 	         		+" CONNECT BY PRIOR  EMPLOYEE_ID = MANAGER_ID";
+245: 	        Connection conn=null;
+246: 	        PreparedStatement psmt=null;
+247: 	        ResultSet rs=null;
+248: 	        int count=0;
+249: 	        try {
+250: 	        	 conn=getConnection();
+251: 	             psmt=conn.prepareStatement(SQL);
+252: 	             log("3/6 getTreeMaxLevel Success!!!");
+253: 	             log(SQL,"getTreeMaxLevel");
+254: 	             rs =psmt.executeQuery();
+255: 	             log("4/6 getTreeMaxLevel Success!!!");
+256: 	             if (rs.next()) {
+257: 	                 count=rs.getInt(1);
+258: 	             }
+259: 	             log("5/6 getTreeMaxLevel Success!!!");
+260: 	        } catch (SQLException e) {
+261: 	        	log(" getTreeMaxLevel Error!!!",e);
+262: 	        	 throw e;
+263: 	        }finally{
+264: 	        	close(conn, psmt, rs);
+265: 	        }
+266: 	        return count;
+267: 	    }
+268: 	  public  List<EmployeeDto> findEmployeesByManagerId (String empid)  throws SQLException{
+269: 	        String SQL = "SELECT "
+270: 		    			+" E.EMPLOYEE_ID EMPLOYEE_ID, D.EMPLOYEE_ID MANAGER_ID,           "
+271: 		    			+" E.FIRST_NAME ,                                                 "
+272: 		    			+" E.LAST_NAME, E.EMAIL, E.PHONE_NUMBER,E.HIRE_DATE               "
+273: 		    			+" FROM EMPLOYEES E, EMPLOYEES D                                  "
+274: 		    			+" WHERE D.EMPLOYEE_ID=E.MANAGER_ID AND E.MANAGER_ID=?            ";
+275: 	      
+276: 	        Connection conn=null;
+277: 	        PreparedStatement psmt=null;
+278: 	        ResultSet rs=null;
+279: 	        List<EmployeeDto> empList = new ArrayList<>();
+280: 	        try {
+281: 	        	 conn=getConnection();
+282: 	             psmt=conn.prepareStatement(SQL);
+283: 	             psmt.setString(1, empid);
+284: 	             log("3/6 findEmployeesByManagerId Success!!!");
+285: 	             log(SQL,"findEmployeesByManagerId",empid);
+286: 	             rs =psmt.executeQuery();
+287: 	             log("4/6 findEmployeesByManagerId Success!!!");
+288: 	             while (rs.next()) {
+289: 	            	 EmployeeDto emp = new EmployeeDto();
+290: 	                 emp.setEmployeeId(rs.getInt("EMPLOYEE_ID"));
+291: 	                 emp.setFirstName(rs.getString("FIRST_NAME"));
+292: 	                 emp.setLastName(rs.getString("LAST_NAME"));
+293: 	                 emp.setEmail(rs.getString("EMAIL"));
+294: 	                 emp.setPhoneNumber(rs.getString("PHONE_NUMBER"));
+295: 	                 emp.setHireDate(rs.getDate("HIRE_DATE"));
+296: 	                 empList.add(emp);
+297: 	             }
+298: 	             log("5/6 findEmployeesByManagerId Success!!!");
+299: 	        } catch (SQLException e) {
+300: 	        	 log(" findEmployeesByManagerId Error!!!",e);
+301: 	        	 throw e;
+302: 	        }finally{
+303: 	        	close(conn, psmt, rs);
+304: 	        }
+305: 	        return empList;
+306: 	    }
+307: 	  
+308: 	  
+309: 	  public  List<String> findAllJobs () throws SQLException {
+310: 	        String SQL= " SELECT JOB_ID, JOB_TITLE FROM JOBS           ";
+311: 	        Connection conn=null;
+312: 	        PreparedStatement psmt=null;
+313: 	        ResultSet rs=null;
+314: 	        List<String> jobList = new ArrayList<>();
+315: 	        try {
+316: 	        	 conn=getConnection();
+317: 	             psmt=conn.prepareStatement(SQL);
+318: 	             log(SQL,"findAllJobs");
+319: 	             log("3/6 findAllJobs Success!!!");
+320: 	             rs =psmt.executeQuery();
+321: 	             log("4/6 findAllJobs Success!!!");
+322: 	             while (rs.next()) {
+323: 	                 //jobList.add(String.format("%s(%s)",rs.getString("JOB_ID"),rs.getString("JOB_TITLE")));
+324: 	                 jobList.add(String.format("%s",rs.getString("JOB_ID")));
+325: 	             }
+326: 	             log("5/6 findAllJobs Success!!!");
+327: 	        } catch (SQLException e) {
+328: 	        	log(" findAllJobs Error!!!",e);
+329: 	        }finally{
+330: 	        	close(conn, psmt, rs);
+331: 	        }
+332: 	        return jobList;
+333: 	    }
+334: 
+335: 	  public  List<EmployeeDto> findEmployeesByDepartName (String department_name) throws SQLException {
+336: 		    List<EmployeeDto> empList = new ArrayList<>();
+337: 	    	//ObservableList<Employee> empList = FXCollections.observableArrayList();
+338: 	    	String SQL = 
+339: 		        		" SELECT * FROM EMPLOYEES            "
+340: 		        		+" WHERE DEPARTMENT_ID=            "
+341: 		        		+" (SELECT DEPARTMENT_ID FROM DEPARTMENTS WHERE DEPARTMENT_NAME=?)            ";
+342: 	    	String SQL2 = 
+343: 		        		" SELECT * FROM EMPLOYEES            "
+344: 		        		+" WHERE DEPARTMENT_ID IS NULL ";
+345: 	        Connection conn=null;
+346: 	        PreparedStatement psmt=null;
+347: 	        ResultSet rs=null;
+348: 	        try {
+349: 	            conn=getConnection();
+350: 	            if(department_name==null ||  department_name.equalsIgnoreCase("NotYet")){
+351: 	            	 psmt=conn.prepareStatement(SQL2);
+352: 	            	 log(SQL2,"findEmployeesByDepartName");
+353: 	            }else {
+354: 	            	 psmt=conn.prepareStatement(SQL);
+355: 	            	 psmt.setString(1, department_name.trim());
+356: 	            	 log(SQL,"findEmployeesByDepartName",department_name);
+357: 	            }
+358: 	            log("3/6 findEmployeesByDepartName Success!!!");
+359: 	            rs =psmt.executeQuery(); 
+360: 	            log("4/6 findEmployeesByDepartName Success!!!");
+361: 	            while (rs.next()) {
+362: 	            	EmployeeDto emp  = new EmployeeDto();
+363: 	                emp.setEmployeeId(rs.getInt("EMPLOYEE_ID"));
+364: 	                emp.setFirstName(rs.getString("FIRST_NAME"));
+365: 	                emp.setLastName(rs.getString("LAST_NAME"));
+366: 	                emp.setEmail(rs.getString("EMAIL"));
+367: 	                emp.setPhoneNumber(rs.getString("PHONE_NUMBER"));
+368: 	                emp.setHireDate(rs.getDate("HIRE_DATE"));
+369: 	                emp.setJobId(rs.getString("JOB_ID"));
+370: 	                emp.setSalary(rs.getInt("SALARY"));
+371: 	                emp.setCommissionPct(rs.getDouble("COMMISSION_PCT"));
+372: 	                emp.setManagerId(rs.getInt("MANAGER_ID"));
+373: 	                emp.setDepartmantId(rs.getInt("DEPARTMENT_ID"));
+374: 	                empList.add(emp);
+375: 	            }
+376: 	            log("5/6 findEmployeesByDepartName Success!!!");
+377: 	        } catch (SQLException e) {
+378: 	        	log(" findEmployeesByDepartName Error!!!",e);
+379: 	        }finally{
+380: 	        	close(conn, psmt, rs);
+381: 	        }
+382: 	        return empList;
+383: 	    }
+384: 	  public  List<EmployeeDto> findEmployeesByEmpId (String empid) throws SQLException {
+385: 	        String SQL = ""
+386: 	        		+" SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME,                "
+387: 	        		+" EMAIL,PHONE_NUMBER,HIRE_DATE FROM EMPLOYEES               "
+388: 	        		+" START WITH  EMPLOYEE_ID =?                                "
+389: 	        		+" CONNECT BY PRIOR EMPLOYEE_ID = MANAGER_ID";
+390: 	        Connection conn=null;
+391: 	        PreparedStatement psmt=null;
+392: 	        ResultSet rs=null;
+393: 	        List<EmployeeDto> empList = new ArrayList<>();
+394: 	        try {
+395: 	        	 conn=getConnection();
+396: 	             psmt=conn.prepareStatement(SQL);
+397: 	             psmt.setString(1, empid);
+398: 	             log("3/6 findEmployeesByEmpId Success!!!");
+399: 	             log(SQL,"findEmployeesByEmpId",empid);
+400: 	             rs =psmt.executeQuery();
+401: 	             log("4/6 findEmployeesByEmpId Success!!!");
+402: 	             while (rs.next()) {
+403: 	            	 EmployeeDto emp = new EmployeeDto();
+404: 	                 emp.setEmployeeId(rs.getInt("EMPLOYEE_ID"));
+405: 	                 emp.setFirstName(rs.getString("FIRST_NAME"));
+406: 	                 emp.setLastName(rs.getString("LAST_NAME"));
+407: 	                 emp.setEmail(rs.getString("EMAIL"));
+408: 	                 emp.setPhoneNumber(rs.getString("PHONE_NUMBER"));
+409: 	                 emp.setHireDate(rs.getDate("HIRE_DATE"));
+410: 	                 empList.add(emp);
+411: 	             }
+412: 	             log("5/6 findEmployeesByEmpId Success!!!");
+413: 	        } catch (SQLException e) {
+414: 	        	 log(" findEmployeesByEmpId Error!!!",e);
+415: 	        }finally{
+416: 	        	close(conn, psmt, rs);
+417: 	        }
+418: 	        return empList;
+419: 	    }
+420: 	  public  EmployeeDto findEmployeeById (String empId) throws SQLException {
+421: 	        String SQL = " SELECT * FROM EMPLOYEES WHERE EMPLOYEE_ID="+empId;
+422: 	        Connection conn=null;
+423: 	        PreparedStatement psmt=null;
+424: 	        ResultSet rs=null;
+425: 	        EmployeeDto emp =  null;
+426: 	        try {
+427: 	            conn=getConnection();
+428: 	            psmt=conn.prepareStatement(SQL);
+429: 	            log("3/6 findEmployeeById Success!!!");
+430: 	            log(SQL,"findEmployeeById",empId);
+431: 	            rs =psmt.executeQuery();
+432: 	            log("4/6 findEmployeeById Success!!!");
+433: 	           
+434: 	            if (rs.next()) {
+435: 	                emp = new EmployeeDto();
+436: 	                emp.setEmployeeId(rs.getInt("EMPLOYEE_ID"));
+437: 	                emp.setFirstName(rs.getString("FIRST_NAME"));
+438: 	                emp.setLastName(rs.getString("LAST_NAME"));
+439: 	                emp.setEmail(rs.getString("EMAIL"));
+440: 	                emp.setPhoneNumber(rs.getString("PHONE_NUMBER"));
+441: 	                emp.setHireDate(rs.getDate("HIRE_DATE"));
+442: 	                emp.setJobId(rs.getString("JOB_ID"));
+443: 	                emp.setSalary(rs.getInt("SALARY"));
+444: 	                emp.setCommissionPct(rs.getDouble("COMMISSION_PCT"));
+445: 	                emp.setManagerId(rs.getInt("MANAGER_ID"));
+446: 	                emp.setDepartmantId(rs.getInt("DEPARTMENT_ID"));
+447: 	            }
+448: 	            log("5/6 findEmployeeById Success!!!");
+449: 	        } catch (SQLException e) {
+450: 	        	log(" findEmployeeById Error!!!",e);
+451: 	        }finally{
+452: 	        	close(conn, psmt, rs);
+453: 	        }
+454: 	        return emp;
+455: 	    }
+456: 	//대소문자 구별없이 서치 가능
+457: 		public List<EmployeeDto> findManagersByName(String searchManagerId) throws SQLException{
+458: 			String SQL = ""
+459: 	        		+" SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE                   "
+460: 	        		+" FROM EMPLOYEES                                                       "
+461: 	        		+" WHERE    (UPPER(LAST_NAME) LIKE   "+"'%"+searchManagerId.toUpperCase()+"%' )              "
+462: 	        		+" OR (UPPER(FIRST_NAME) LIKE   "+"'%"+searchManagerId.toUpperCase()+"%' )            "
+463: 	        		+" ORDER BY EMPLOYEE_ID                 ";
+464: 
+465: 	        Connection conn=null;
+466: 	        PreparedStatement psmt=null;
+467: 	        ResultSet rs=null;
+468: 	        List<EmployeeDto> empList = new ArrayList<>();
+469: 	        try {
+470: 	        	 conn=getConnection();
+471: 	             psmt=conn.prepareStatement(SQL);
+472: 	             log("3/6 findManagersByName Success!!!");
+473: 	             log(SQL,"findManagersByName");
+474: 	             rs =psmt.executeQuery();
+475: 	             log("4/6 findManagersByName Success!!!");
+476: 	             while (rs.next()) {
+477: 	            	 EmployeeDto emp = new EmployeeDto();
+478: 	                 emp.setEmployeeId(rs.getInt("EMPLOYEE_ID"));
+479: 	                 emp.setFirstName(rs.getString("FIRST_NAME"));
+480: 	                 emp.setLastName(rs.getString("LAST_NAME"));
+481: 	                 emp.setEmail(rs.getString("EMAIL"));
+482: 	                 emp.setPhoneNumber(rs.getString("PHONE_NUMBER"));
+483: 	                 emp.setHireDate(rs.getDate("HIRE_DATE"));
+484: 	                 empList.add(emp);
+485: 	             }
+486: 	             log("5/6 findManagersByName Success!!!");
+487: 	        } catch (SQLException e) {
+488: 	        	 log(" findManagersByName Error!!!",e);
+489: 	        }finally{
+490: 	        	close(conn, psmt, rs);
+491: 	        }
+492: 	        return empList;
+493: 		}
+494: 		public  int addEmployee (EmployeeDto emp) throws SQLException {
+495: 			  String SQL =""+
+496: 			                  "INSERT INTO EMPLOYEES	          " 
+497: 			                  + " (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL,          "
+498: 			                  + " PHONE_NUMBER,  HIRE_DATE, JOB_ID, SALARY,          "
+499: 			                  + " COMMISSION_PCT,MANAGER_ID,DEPARTMENT_ID )	          " 
+500: 			                  + " VALUES(EMPLOYEES_SEQ.NEXTVAL,?,?,?,"
+501: 			                  + " ?,?,?"
+502: 			                  + " ,"+quots(emp.getSalary()+"")
+503: 			                  + " ,"+quots(emp.getCommissionPct()+"")
+504: 			                  + " ,"+quoti(emp.getManagerId()+"")
+505: 			                  + " , "+quoti(emp.getDepartmantId()+"")
+506: 			                  + ") " ;
+507: 			  String SQL2=" SELECT EMPLOYEES_SEQ.CURRVAL FROM EMPLOYEES ";
+508: 			  
+509: 			  Connection conn=null;
+510: 			  PreparedStatement psmt=null;
+511: 			  ResultSet rs=null;
+512: 			  int count=0;
+513: 			  try {
+514: 				  conn=getConnection();
+515: 				  conn.setAutoCommit(false);      //TRX
+516: 		          psmt=conn.prepareStatement(SQL);
+517: 		          int i=1;
+518: 		          //아이디는 시퀀스 -> 자동입력						//EMPLOYEE_ID-> SEQUENCE_EMPLOYEE.NEXTVAL
+519: 		          psmt.setString(i++,emp.getFirstName());   //FIRST_NAME
+520: 		          psmt.setString(i++,emp.getLastName());    //LAST_NAME
+521: 		          psmt.setString(i++,emp.getEmail());		//EMAIL
+522: 		          psmt.setString(i++,emp.getPhoneNumber()); //PHONE_NUMBER
+523: 		          psmt.setDate(i++, (java.sql.Date)emp.getHireDate());//HIRE_DATE
+524: 		          psmt.setString(i++,emp.getJobId());		//JOB_ID
+525: 		         
+526: 		          log(SQL,"addEmployee",emp);
+527: 		          log("3/6 addEmployee Success 1!!!");
+528: 		          psmt.executeUpdate();
+529: 		          log("4/6 addEmployee Success 1!!!");
+530: 		          log("3/6 addEmployee Success 2!!!");
+531: 		          psmt=conn.prepareStatement(SQL2);
+532: 		          rs=psmt.executeQuery();
+533: 		          if(rs.next()){
+534: 		        	  count=rs.getInt(1);
+535: 		          }
+536: 		          log("4/6 addEmployee Success 2 !!!");
+537: 		          conn.commit();
+538: 			  } catch (SQLException e) {
+539: 				  log(" addEmployee Error!!!",e);
+540: 				  conn.rollback();
+541: 				  throw e;
+542: 			  }finally{
+543: 				  conn.setAutoCommit(true);
+544: 		      	  close(conn, psmt, rs);
+545: 		      }
+546: 		      return count;
+547: 			}
+548: 
+549: 		public  boolean updateEmployee(EmployeeDto emp) throws SQLException {
+550: 			  String SQL =""
+551: 	         +"  UPDATE EMPLOYEES   SET                                                          "
+552: 	         + " FIRST_NAME=?, LAST_NAME=?  ,      EMAIL=?,                                      " 
+553: 	         + " PHONE_NUMBER=?,    JOB_ID=?,                                      "
+554: 	         + " SALARY=%s,         COMMISSION_PCT=%s, MANAGER_ID=%s, DEPARTMENT_ID=%s           "
+555: 	         + " WHERE EMPLOYEE_ID=?                                                             " ;
+556: 
+557: 			  String sql=String.format(SQL, 
+558: 					  quotd(emp.getSalary()+""),quoti(emp.getCommissionPct()+""),
+559: 					  quoti(emp.getManagerId()+""),quoti(emp.getDepartmantId()+""));
+560: 			  Connection conn=null;
+561: 			  PreparedStatement psmt=null;
+562: 			  ResultSet rs=null;
+563: 			  int count=0;
+564: 			  try {
+565: 				  conn=getConnection();
+566: 		          psmt=conn.prepareStatement(sql);
+567: 		          int i=1;
+568: 		          psmt.setString(i++,    emp.getFirstName());   
+569: 		          psmt.setString(i++,    emp.getLastName());
+570: 		          psmt.setString(i++,  emp.getEmail());
+571: 		          psmt.setString(i++,    emp.getPhoneNumber());
+572: 		          //psmt.setDate(i++,      (java.sql.Date)emp.getHireDate());//HIRE_DATE
+573: 		          psmt.setString(i++,    emp.getJobId());
+574: 		          psmt.setInt(i++,       emp.getEmployeeId());
+575: 	              //SALARY
+576: 		          //COMMISSION_PCT
+577: 		          //MANAGER_ID
+578: 		          //DEPARTMENT_ID
+579: 		          log(sql,"updateEmployee",emp);  //EMPLOYEE_ID
+580: 		          log("3/6 updateEmployee Success 1!!!");
+581: 		          count=psmt.executeUpdate();
+582: 		          log("4/6 updateEmployee Success 2 !!!");
+583: 			  } catch (SQLException e) {
+584: 				  log(" updateEmployee Error!!!",e);
+585: 				  throw e;
+586: 			  }finally{
+587: 		      	close(conn, psmt, rs);
+588: 		      }
+589: 		      return count>0?true:false;
+590: 			}
+591: 		  
+592: 		  
+593: 		  public  boolean updateJobHistory(EmployeeDto emp) throws SQLException {
+594: 			  String SQL =""
+595: 	         +"  UPDATE EMPLOYEES   SET                                    "
+596: 	         + " JOB_ID=?,  DEPARTMENT_ID=?                  "
+597: 	         + " WHERE EMPLOYEE_ID=?                                       " ;
+598: 
+599: 			  String sql=String.format(SQL, 
+600: 					  quotd(emp.getSalary()+""),quoti(emp.getCommissionPct()+""),
+601: 					  quoti(emp.getManagerId()+""),quoti(emp.getDepartmantId()+""));
+602: 			  Connection conn=null;
+603: 			  PreparedStatement psmt=null;
+604: 			  ResultSet rs=null;
+605: 			  int count=0;
+606: 			  try {
+607: 				  conn=getConnection();
+608: 		          psmt=conn.prepareStatement(sql);
+609: 		          int i=1;
+610: 		          //psmt.setDate(i++,      (java.sql.Date)emp.getHireDate());//HIRE_DATE
+611: 		          psmt.setString(i++,    emp.getJobId());
+612: 		          psmt.setInt(i++,       emp.getDepartmantId());
+613: 		          psmt.setInt(i++,       emp.getEmployeeId());
+614: 
+615: 		          log(sql,"updateJobHistory",emp);  //EMPLOYEE_ID
+616: 		          log("3/6 updateJobHistory Success 1!!!");
+617: 		          count=psmt.executeUpdate();
+618: 		          log("4/6 updateJobHistory Success 2 !!!");
+619: 			  } catch (SQLException e) {
+620: 				  log(" updateJobHistory Error!!!",e);
+621: 				  throw e;
+622: 			  }finally{
+623: 		      	close(conn, psmt, rs);
+624: 		      }
+625: 		      return count>0?true:false;
+626: 			}
+627: 		  public  boolean deleteEmployee (EmployeeDto emp) throws SQLException {
+628: 			  String SQL =""
+629: 	         +" DELETE   FROM   EMPLOYEES                  "
+630: 	         +" WHERE EMPLOYEE_ID=?                        " ;
+631: 
+632: 			  Connection conn=null;
+633: 			  PreparedStatement psmt=null;
+634: 			  ResultSet rs=null;
+635: 			  int count=0;
+636: 			  try {
+637: 				  conn=getConnection();
+638: 		          psmt=conn.prepareStatement(SQL);
+639: 		          psmt.setInt(1, emp.getEmployeeId());
+640: 		          log(SQL,"deleteEmployee",emp);  //EMPLOYEE_ID
+641: 		          log("3/6 deleteEmployee Success 1!!!");
+642: 		          count=psmt.executeUpdate();
+643: 		          log("4/6 deleteEmployee Success 2 !!!");
+644: 			  } catch (SQLException e) {
+645: 				  log(" deleteEmployee Error!!!",e);
+646: 				
+647: 			  }finally{
+648: 		      	close(conn, psmt, rs);
+649: 		      }
+650: 		      return count>0?true:false;
+651: 			}
+652: }

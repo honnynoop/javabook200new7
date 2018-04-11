@@ -1,0 +1,10 @@
+ChatClientFrameMain를 실행하기전 
+
+kr.co.infopub.chapter.s198.server.ChatServerMain
+를 먼저 실행시키세요.
+
+ChatClientFrameMain를 실행시키고 아이디를 입력하세요.
+ChatClientFrameMain를 실행시키고 다른 아이디를 입력하세요.
+두 아이디사이에 채팅이 가능합니다. 
+
+ChatClientFrameMain를 실행시킨 만큼의 클라이언트가 채팅에 참여합니다.

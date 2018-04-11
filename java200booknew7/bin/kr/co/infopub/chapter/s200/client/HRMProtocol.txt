@@ -1,0 +1,223 @@
+001: package kr.co.infopub.chapter.s200.client;
+002: import java.util.*;
+003: import kr.co.infopub.chapter.s199.common.DepCountDto;
+004: import kr.co.infopub.chapter.s199.common.DepartmentDto;
+005: import kr.co.infopub.chapter.s199.common.EmployeeDto;
+006: import kr.co.infopub.chapter.s199.common.HRMRequest;
+007: import java.io.*;
+008: import java.net.*;
+009: import java.sql.SQLException;
+010: public class HRMProtocol{
+011:  private static int         MIDDLE_TIER_PORT = 9983;
+012:  private HRMRequest         cmndObj;
+013:  private Socket             handler;
+014:  private ObjectOutputStream oos;
+015:  private ObjectInputStream  ois;
+016:  // 생성자로 서버에 연결
+017:  // 객체직렬화가 가능한 ObjectOutputStream, ObjectInputStream를 생성
+018:  public HRMProtocol (String server) throws IOException {
+019:   try{
+020:      handler = new Socket(server, MIDDLE_TIER_PORT);
+021:      oos     = new ObjectOutputStream (handler.getOutputStream());
+022:      ois     = new ObjectInputStream (handler.getInputStream());
+023:      System.out.println("1 HRMProtocol 소켓과 스트림 생성..."+ new Date());
+024:   }catch (IOException e) {
+025:      System.err.println ("Error in HRMProtocol 소켓과 스트림 생성...");
+026:      throw e;
+027:   }
+028:  }
+029:  // 열려있는 Socket를 닫는 메소드
+030:  public void close() throws IOException {
+031:    if(oos!=null)oos.close();
+032:    if(ois!=null)ois.close();
+033:    if(handler!=null)handler.close();
+034:  }
+035:  // 서버의 protocol handler로부터 응답을 받음
+036:  // HRMRequest내부에 HRMResponse가 있다
+037:  public int getResponse () {
+038:   try {
+039:      cmndObj = (HRMRequest)ois.readObject();
+040:      System.out.println("2 HRMProtocol HRMRequest 받기 ...");
+041:   }catch(ClassNotFoundException e){
+042:      System.err.println("HRMRequest를 못찾음...");
+043:   }catch(InvalidClassException e){
+044:      System.err.println("직렬화가 잘못됨(직렬화,Object Graph 확인)...");
+045:   }catch(StreamCorruptedException e){
+046:      System.err.println("Stream에 이상...");
+047:   }catch(IOException e){
+048:      System.err.println("IO 예외발생...");
+049:   }catch(Exception e){
+050:      System.err.println("그 외 예외가 발생함...");
+051:   }
+052:   int status = cmndObj.getResult().getStatus();
+053:   //응답이 음수면 예외알려줌
+054:   if (status < 0) System.err.println ("응답이 음수임..." + status);
+055:       return (status);
+056:  } 
+057:  // HRMRequest 객체를 미들서버로 보냄
+058:  private void writeCommand (HRMRequest commandObj) {
+059:   try {        
+060:      oos.writeObject (commandObj);
+061:      oos.flush();
+062:   }catch(InvalidClassException e){
+063:      System.err.println("잘못된 캐스팅문제: Serializable -> DTO ");
+064:   }catch(NotSerializableException e){
+065:      System.err.println("질력화 문제(직렬화, Object Graph)");
+066:   }catch(IOException e){
+067:      System.err.println("Stream 통신문제");
+068:   }
+069:  }
+070:  // HRMRequest에 요청 프로토콜을 넣고 미들서버로 보냄
+071:  public void sendCommand(int command){
+072:   System.err.println("Sending: " + command);
+073:   cmndObj = new HRMRequest(command);
+074:   writeCommand(cmndObj);
+075:  }
+076:  // HRMRequest에 요청 프로토콜을 넣고 미들서버로 보냄, 아규먼트 1개
+077:  public void sendCommand(int command, Serializable requestObject){ 
+078:   System.out.println("Sending: " + command + " " + requestObject);
+079:   cmndObj = new HRMRequest(command);
+080:   cmndObj.setRequestObject(requestObject);
+081:   writeCommand(cmndObj);
+082:  }
+083:  // sendCommand를 이용하여 서버에 요청보내고 결과 받기
+084:  public List<DepartmentDto> findAllDepartments () throws SQLException{
+085:   sendCommand(HRMRequest.findAllDepartments);
+086:   int response = getResponse();
+087:   if (response < 0){
+088:      System.err.println("Protocol error: findAllDepartments");
+089:      throw new SQLException("Protocol error: findAllDepartments");
+090:   }
+091:   return (List<DepartmentDto>)cmndObj.getResult().get(0);
+092:  }
+093:  public  List<EmployeeDto> findAllEmployees ()  throws SQLException{
+094:   sendCommand(HRMRequest.findAllEmployees);
+095:   int response = getResponse();
+096:   if (response < 0){
+097:      System.err.println("Protocol error: findAllEmployees");
+098:      throw new SQLException("Protocol error: findAllEmployees");
+099:   }
+100:   return (List<EmployeeDto>)cmndObj.getResult().get(0);
+101:  }
+102:  public  List<EmployeeDto> findTreeManagerInEmployee ()  throws SQLException{
+103:   sendCommand(HRMRequest.findTreeManagerInEmployee);
+104:   int response = getResponse();
+105:   if (response < 0){
+106:      System.err.println("Protocol error: findTreeManagerInEmployee");
+107:      throw new SQLException("Protocol error: findTreeManagerInEmployee");
+108:   }
+109:   return (List<EmployeeDto>)cmndObj.getResult().get(0);
+110:  }
+111:  public  int getTreeMaxLevel () throws SQLException {
+112:   sendCommand(HRMRequest.getTreeMaxLevel);
+113:   int response = getResponse();
+114:   if (response < 0){
+115:      System.err.println("Protocol error: getTreeMaxLevel");
+116:      throw new SQLException("Protocol error: getTreeMaxLevel");
+117:   }
+118:   return (int)cmndObj.getResult().get(0);
+119:  }
+120:  public  List<DepCountDto> findAllDepCounts () throws SQLException{
+121:   sendCommand(HRMRequest.findAllDepCounts);
+122:   int response = getResponse();
+123:   if (response < 0){
+124:      System.err.println("Protocol error: findAllDepCounts");
+125:      throw new SQLException("Protocol error: findAllDepCounts");
+126:   }
+127:   return (List<DepCountDto>)cmndObj.getResult().get(0);
+128:  }
+129:  public  List<EmployeeDto>
+130:    findEmployeesByDepartName(String val) throws SQLException{
+131:   sendCommand(HRMRequest.findEmployeesByDepartName, val);
+132:   int response = getResponse();
+133:   if (response < 0){
+134:      System.err.println("Protocol error: findEmployeesByDepartName");
+135:      throw new SQLException("Protocol error: findEmployeesByDepartName");
+136:   }
+137:   return (List<EmployeeDto>)cmndObj.getResult().get(0);
+138:  }
+139:  public List<EmployeeDto>
+140:           findEmployeesByEmpId(String val) throws SQLException{
+141:   sendCommand(HRMRequest.findEmployeesByEmpId,val);
+142:   int response = getResponse();
+143:   if (response < 0){
+144:      System.err.println("Protocol error: findEmployeesByEmpId");
+145:      throw new SQLException("Protocol error: findEmployeesByEmpId");
+146:   }
+147:   return (List<EmployeeDto>)cmndObj.getResult().get(0);
+148:  }
+149:  public EmployeeDto findEmployeeById(String val) throws SQLException{
+150:   sendCommand(HRMRequest.findEmployeeById,val);
+151:   int response = getResponse();
+152:   if (response < 0){
+153:      System.err.println("Protocol error: findEmployeeById");
+154:      throw new SQLException("Protocol error: findEmployeeById");
+155:   }
+156:   return (EmployeeDto)cmndObj.getResult().get(0);
+157:  }
+158:  public List<EmployeeDto>
+159:      findManagersByName(String searchname) throws SQLException{
+160:   sendCommand(HRMRequest.findManagersByName,searchname);
+161:   int response = getResponse();
+162:   if (response < 0){
+163:      System.err.println("Protocol error: findManagersByName");
+164:      throw new SQLException("Protocol error: findManagersByName");
+165:   }
+166:   return (List<EmployeeDto>)cmndObj.getResult().get(0);
+167:  }
+168:  public List<String> findAllJobs() throws SQLException{
+169:   sendCommand(HRMRequest.findAllJobs);
+170:   int response = getResponse();
+171:   if (response < 0){
+172:      System.err.println("Protocol error: findAllJobs");
+173:      throw new SQLException("Protocol error: findAllJobs");
+174:   }
+175:   return (List<String>)cmndObj.getResult().get(0);
+176:  }
+177:  public List<DepartmentDto>
+178:                     findAllDepartments2() throws SQLException{
+179:   sendCommand(HRMRequest.findAllDepartments2);
+180:   int response = getResponse();
+181:   if (response < 0){
+182:      System.err.println("Protocol error: findAllDepartments2");
+183:      throw new SQLException("Protocol error: findAllDepartments2");
+184:   }
+185:   return (List<DepartmentDto>)cmndObj.getResult().get(0);
+186:  }
+187:  public int addEmployee(EmployeeDto empdto) throws SQLException{
+188:   sendCommand(HRMRequest.addEmployee,empdto);
+189:   int response = getResponse();
+190:   if (response < 0){
+191:      System.err.println("Protocol error: addEmployee");
+192:      throw new SQLException("Protocol error: addEmployee");
+193:   }
+194:   return (int)cmndObj.getResult().get(0);
+195:  }
+196:  public boolean updateEmployee(EmployeeDto emp) throws SQLException{
+197:   sendCommand(HRMRequest.updateEmployee, emp);
+198:   int response = getResponse();
+199:   if (response < 0){
+200:      System.err.println("Protocol error: updateEmployee");
+201:      throw new SQLException("Protocol error: updateEmployee");
+202:   }
+203:   return (boolean)cmndObj.getResult().get(0);
+204:  }
+205:  public boolean deleteEmployee(EmployeeDto emp) throws SQLException{
+206:   sendCommand(HRMRequest.deleteEmployee,emp);
+207:   int response = getResponse();
+208:   if (response < 0){
+209:      System.err.println("Protocol error: deleteEmployee");
+210:      throw new SQLException("Protocol error: deleteEmployee");
+211:   }
+212:   return (boolean)cmndObj.getResult().get(0);
+213:  }
+214:  public int getEmployeesTotal() throws SQLException{
+215:   sendCommand(HRMRequest.getEmployeesTotal);
+216:   int response = getResponse();
+217:   if (response < 0){
+218:      System.err.println("Protocol error: getEmployeesTotal");
+219:      throw new SQLException("Protocol error: getEmployeesTotal");
+220:   }
+221:   return (int)cmndObj.getResult().get(0);
+222:  }
+223: }

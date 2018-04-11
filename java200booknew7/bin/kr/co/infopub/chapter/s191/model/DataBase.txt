@@ -1,0 +1,135 @@
+001: package kr.co.infopub.chapter.s191.model;
+002: 
+003: import java.sql.ResultSet;
+004: import java.sql.DriverManager;
+005: import java.sql.Statement;
+006: import java.text.SimpleDateFormat;
+007: import java.util.Date;
+008: import java.sql.Connection;
+009: import java.sql.SQLException;
+010: 
+011: public abstract class DataBase {
+012: 	public static final String DRIVER="oracle.jdbc.driver.OracleDriver";
+013: 	public static final String URLS="jdbc:oracle:thin:@127.0.0.1:1521:xe";
+014: 	public static final String USER="hr";
+015: 	public static final String PWD="hr";
+016: 	private boolean isD=true;
+017: 	private boolean isS=true;
+018: 	public DataBase() {
+019: 		init();   // 드라이버 로딩
+020: 	}//
+021: 	private void init(){
+022: 		try {
+023: 			Class.forName(DRIVER);
+024: 			log("1/6 Driver Loading Success!!!");
+025: 		} catch (ClassNotFoundException e) {
+026: 			log("1/6 Driver Loading Fail!!!");
+027: 		}//
+028: 	}
+029: 	public void log(String msg){
+030: 		if(isD){
+031: 			System.out.println(this.getClass()+": "+msg);
+032: 		}
+033: 	}//
+034: 	public void log(String msg,String methodName){
+035: 		if(isD || isS){
+036: 			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm");
+037: 			String[] mmm=msg.split("     ");
+038: 			String ss="";
+039: 			for (int i = 0; i < mmm.length; i++) {
+040: 				if(mmm[i]!=null && !mmm[i].trim().equals("")){
+041: 					ss+= " "+mmm[i].trim()+" \n ";
+042: 				}
+043: 			}
+044: 			System.out.println("CRUD-------------------------------"+this.getClass()+"."+methodName+"()");
+045: 			System.out.println(ss.trim());
+046: 			System.out.println("CRUD--------------------------------------"+sdf.format(new Date()));
+047: 		}
+048: 	}//
+049: 	public void log(String msg,String methodName,Object data){
+050: 		if(isD || isS){
+051: 			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm");
+052: 			String[] mmm=msg.split("     ");
+053: 			String ss="";
+054: 			for (int i = 0; i < mmm.length; i++) {
+055: 				if(mmm[i]!=null && !mmm[i].trim().equals("")){
+056: 					ss+= " "+mmm[i].trim()+" \n ";
+057: 				}
+058: 			}
+059: 			System.out.println("CRUD-------------------------------"+this.getClass()+"."+methodName+"()");
+060: 			System.out.println(ss.trim());
+061: 			System.out.println("Data : "+data.toString());
+062: 			System.out.println("CRUD--------------------------------------"+sdf.format(new Date()));
+063: 		}
+064: 	}//
+065: 	
+066: 	
+067: 	
+068: 	public void log(String msg,Exception e){
+069: 		if(isD){
+070: 			System.out.println(this.getClass()+": "+msg);
+071: 			System.out.println("============>"+e);
+072: 		}
+073: 	}//
+074: 	 public String quots(String msg){
+075:    	  String ss="";
+076: 	   	  if(msg==null || msg.trim().equals("")|| msg.trim().equals("0")|| msg.trim().equals("0.0")){
+077: 	   		  ss=" NULL ";
+078: 	   	  }else{
+079: 	   		  ss="'"+msg+"'";
+080: 	   	  }
+081: 	   	  return ss;
+082:      }
+083:      public String quoti(String msg){
+084: 	   	  String ss="";
+085: 	   	  if(msg==null || msg.trim().equals("")|| msg.trim().equals("0")|| msg.trim().equals("0.0")){
+086: 	   		  ss=" NULL ";
+087: 	   	  }else{
+088: 	   		  ss=""+msg+"";
+089: 	   	  }
+090: 	   	  return ss;
+091:      }
+092:      public String quotd(String msg){
+093: 	   	  String ss="";
+094: 	   	  if(msg==null || msg.trim().equals("")|| msg.trim().equals("0")|| msg.trim().equals("0.0")){
+095: 	   		  ss=" NULL ";
+096: 	   	  }else{
+097: 	   		  ss=""+msg+"";
+098: 	   	  }
+099: 	   	  return ss;
+100:      }
+101: 	//--------------------------------------
+102: 	public Connection getConnection() throws SQLException{//
+103: 		Connection conn=null;
+104: 		conn=DriverManager.getConnection(
+105: 				URLS, 
+106: 				USER,
+107: 				PWD);
+108: 		log("2/6 Connection Success!!!");
+109: 		return conn;
+110: 	}//getConnection
+111: 	public void close(Connection conn, Statement stmt,ResultSet rs){
+112: 		if(rs!=null){
+113: 			try {
+114: 				rs.close();
+115: 			} catch (SQLException e) {
+116: 				
+117: 			}
+118: 		}//
+119: 		if(stmt!=null){
+120: 			try {
+121: 				stmt.close();
+122: 			} catch (SQLException e) {
+123: 				
+124: 			}
+125: 		}//
+126: 		if(conn!=null){
+127: 			try {
+128: 				conn.close();
+129: 				log("6/6 Close Success!!!");
+130: 			} catch (SQLException e) {
+131: 				log("6/6 Close Fail: ",e);
+132: 			}
+133: 		}//
+134: 	}//close
+135: }

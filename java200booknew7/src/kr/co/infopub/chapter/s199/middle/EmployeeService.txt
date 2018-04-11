@@ -1,0 +1,95 @@
+01: package kr.co.infopub.chapter.s199.middle;
+02: import java.io.IOException;
+03: import java.sql.SQLException;
+04: import java.util.List;
+05: import javafx.collections.ObservableList;
+06: import kr.co.infopub.chapter.s199.common.DepCountDto;
+07: import kr.co.infopub.chapter.s199.common.DepartmentDto;
+08: import kr.co.infopub.chapter.s199.common.EmployeeDto;
+09: import kr.co.infopub.chapter.s200.client.HRMProtocol;
+10: import kr.co.infopub.chapter.s200.dto.DepConvert;
+11: import kr.co.infopub.chapter.s200.dto.DepCount;
+12: import kr.co.infopub.chapter.s200.dto.DepCountConvert;
+13: import kr.co.infopub.chapter.s200.dto.Department;
+14: import kr.co.infopub.chapter.s200.dto.EmpConvert;
+15: import kr.co.infopub.chapter.s200.dto.Employee;
+16: public class EmployeeService { 
+17:  // 자신을 private static 
+18:  private static EmployeeService employeeService;
+19:  private static EmployeeDAO employeeDAO; 
+20:  // 생성자도 private
+21:  private EmployeeService() {
+22: 	 employeeDAO=new EmployeeDAO();
+23:  }
+24:  // static -> 한번의 객체생성 
+25:  public static EmployeeService getInstance(){
+26: 	if(employeeService==null){
+27: 		employeeService=new EmployeeService();
+28: 	}
+29: 	return employeeService;
+30:  }//--------------DAO를 감싸고, List -> ObservableList
+31:  public List<DepartmentDto>
+32:                      findAllDepartments() throws SQLException{
+33: 	List<DepartmentDto> blist=employeeDAO.findAllDepartments();
+34: 	return blist;
+35:  }
+36:  public List<EmployeeDto> findAllEmployees() throws SQLException{
+37: 	List<EmployeeDto> blist  = employeeDAO.findAllEmployees ();
+38: 	return blist;
+39:  }
+40:  public List<EmployeeDto> findTreeManagerInEmployee() 
+41: 		                                   throws SQLException{
+42: 	List<EmployeeDto> bdlists= employeeDAO.findTreeManagerInEmployee();
+43: 	return bdlists;
+44:  }
+45:  public int getTreeMaxLevel() throws SQLException{
+46: 	return  employeeDAO.getTreeMaxLevel();
+47:  }
+48:  public List<DepCountDto> findAllDepCounts() throws SQLException{
+49:     List<DepCountDto> deplist = employeeDAO.findAllDepCounts();
+50:     return deplist;
+51:  }
+52:  //-------------------------여기 까지 테스트용
+53:  public  List<EmployeeDto>
+54:           findEmployeesByDepartName(String val) throws SQLException{
+55: 	 List<EmployeeDto> emplists=
+56: 			               employeeDAO.findEmployeesByDepartName(val);
+57: 	 return emplists;
+58:  }
+59:  
+60:  public List<EmployeeDto>
+61:                  findEmployeesByEmpId(String val) throws SQLException{
+62:   List<EmployeeDto> elists=employeeDAO.findEmployeesByEmpId(val);//100
+63: 	return elists;
+64:  }
+65:  public EmployeeDto findEmployeeById(String string) throws SQLException{
+66: 	EmployeeDto edto =employeeDAO.findEmployeeById(string);
+67: 	return edto;
+68:  }
+69:  public List<EmployeeDto>
+70:             findManagersByName(String searchname) throws SQLException{
+71: 	List<EmployeeDto> elists=employeeDAO.findManagersByName(searchname);
+72: 	return elists;
+73:  }
+74:  public List<String> findAllJobs() throws SQLException{
+75:     List<String> jlists=employeeDAO.findAllJobs();
+76: 	return jlists;
+77:  }
+78:  public List<DepartmentDto>
+79:                            findAllDepartments2() throws SQLException{
+80:     List<DepartmentDto> edeps=employeeDAO.findAllDepartments2 ();
+81: 	return edeps;
+82:  }
+83:  public int addEmployee(EmployeeDto empdto) throws SQLException{
+84: 	return employeeDAO.addEmployee(empdto);
+85:  }
+86:  public boolean updateEmployee(EmployeeDto emp) throws SQLException{
+87: 	return employeeDAO.updateEmployee(emp);
+88:  }
+89:  public boolean deleteEmployee(EmployeeDto emp) throws SQLException{
+90: 	return employeeDAO.deleteEmployee(emp);
+91:  }
+92:  public int getEmployeesTotal() throws SQLException{
+93: 	return employeeDAO.getEmployeesTotal();
+94:  }
+95: }

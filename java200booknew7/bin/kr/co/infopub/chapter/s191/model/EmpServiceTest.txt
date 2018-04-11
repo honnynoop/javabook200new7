@@ -1,0 +1,19 @@
+01: package kr.co.infopub.chapter.s191.model;
+02: import java.sql.SQLException;
+03: import javafx.collections.ObservableList;
+04: import kr.co.infopub.chapter.s191.dto.Employee;
+05: public class EmpServiceTest {
+06:  public static void main(String[] args) {
+07: 	EmployeeService service=EmployeeService.getInstance();
+08: 	try {
+09: 		ObservableList<Employee> emplists=service.findAllEmployees();
+10: 		for (Employee employee : emplists) {
+11: 			System.out.print(employee.getEmployeeId()+"\t");
+12: 			System.out.print(employee.getFirstName()+"\t");
+13: 			System.out.println(employee.getLastName());
+14: 		}
+15: 	} catch (SQLException e) {
+16: 		System.out.println(e);
+17: 	}
+18:  }
+19: }

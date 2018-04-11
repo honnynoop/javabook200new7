@@ -1,0 +1,68 @@
+01: package kr.co.infopub.chapter.s199.middle;
+02: import java.io.*;
+03: import java.net.*;
+04: public class  ProtocolHandler implements Runnable{
+05: 	int          listenPort    =  9983;
+06: 	int          alternatePort = listenPort;
+07: 	ServerSocket myServer      = null;
+08: 	JuryThread   juryThread;
+09: 	Socket       answerSocket;
+10: 	EmployeeService     db;
+11: 	public ProtocolHandler(){
+12:         init();
+13:     } 
+14:    // 클라이언트의 접속을 기다릴 서버소켓을 연다.
+15:    // 서버소켓에 사용자가 접속할 때까지 무한루프(블록킹) 기다린다.
+16:    // 서버소켓에 사용자가 접속하면 소켓이 생성된다.
+17:    public void init(){
+18:       try{
+19:     	 System.out.println( "1 서버소켓 생성..");
+20:          myServer = new ServerSocket(listenPort);
+21:          myServer.setReuseAddress(true) ; //ServerSocket port 바로 다시사용
+22:          System.out.println( "2 db연결 ....");
+23: 		 db = EmployeeService.getInstance();
+24:       }catch(IOException e){
+25:          System.out.println(" 데이타베이스 서버에 연결할수 없습니다.");
+26: 		 close();
+27:          System.exit(1);
+28:       }catch(Exception io){
+29:     	 close();
+30:          System.exit(1);
+31:          System.err.println("Unable to create Server Socket!");
+32:       }
+33:    }
+34:    // 사용후 서버소켓을 닫는다.
+35:    public void close(){
+36: 	   try {
+37: 		if(myServer!=null){
+38: 			myServer.close();
+39: 			System.out.println("ServerSocket id dead.");
+40: 		}
+41: 	} catch (IOException e) {
+42: 		
+43: 	}
+44:    }
+45:    // 서버소켓이 생성 되면 클라이언트의 요청을 기다린다.
+46:    // 실제 클라이언트와 데이타베이스의 연동은 JuryThread가 담당한다.
+47:    public void run(){
+48:       while(true){
+49:          try{
+50:             answerSocket = myServer.accept();
+51:             System.out.println( "3 사용자 접속으로 소켓생성 ......");
+52:          }catch(IOException io){
+53:             System.err.println(io.getMessage());
+54:             return;
+55:          }
+56:          System.out.println( "4 배심원 쓰레드 작동 - 요구사항 파악준비 ........");
+57:          juryThread = new JuryThread(answerSocket, db);
+58:          Thread.yield();  // 핸들러 쓰레드 -> JuryThread에게 양보
+59:       }
+60:    }
+61:    // 서버소켓을 열고 클라이언트의 접속을 기다린다.
+62:    // 실제 DB와 연동은 JuryThread가 하도록한다.
+63:    public static void main(String[] args){
+64:       ProtocolHandler myHandler = new ProtocolHandler();
+65:       new Thread(myHandler).start();
+66:       System.out.println("ProtocolHandler server ready..........");
+67:    }
+68: }

@@ -1,0 +1,6 @@
+kr.co.infopub.chapter.s200.Main
+이 클라이언트 메인입니다.
+먼저 미들서버(서버)
+kr.co.infopub.chapter.s199.middle.ProtocolHandler
+를 실행시키십시오. 
+

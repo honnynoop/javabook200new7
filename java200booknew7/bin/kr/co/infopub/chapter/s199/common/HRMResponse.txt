@@ -1,0 +1,19 @@
+01: package kr.co.infopub.chapter.s199.common;
+02: import java.util.*;
+03: import java.io.*;
+04: public class HRMResponse extends Vector implements Serializable {
+05:    private int status = -1;
+06:    public HRMResponse () {
+07:       super(1,1);
+08:    }
+09:    // 응답할 때 성공여부, 양수- 성공, 0이하 실패 
+10:    public int getStatus () {
+11:       return status;
+12:    }
+13:    public void setStatus(int value) {
+14:       status = value;
+15:    }
+16:    public int getNumRows () {
+17:       return this.size();//벡터의 크기
+18:    }
+19: }

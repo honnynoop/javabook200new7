@@ -1,0 +1,167 @@
+001: package kr.co.infopub.chapter.s199.common;
+002: 
+003: import java.io.Serializable;
+004: import java.sql.Date;
+005: 
+006: public class EmployeeDto implements  Serializable{
+007: 	private int employee_id;
+008:     private String first_name;
+009:     private String last_name;
+010:     private String email;
+011:     private String phone_number;
+012:     private Date hire_date;
+013:     private String job_id;
+014:     private double salary;
+015:     private double commission_pct;
+016:     private int manager_id;
+017:     private int department_id;
+018: 
+019:     private String order2;
+020: 
+021: 	public EmployeeDto() {
+022: 		super();
+023: 	}
+024: 
+025: 	public EmployeeDto(int employee_id, String first_name, String last_name, String email, String phone_number,
+026: 			Date hire_date, String job_id, double salary, double commission_pct, int manager_id, int department_id) {
+027: 		super();
+028: 		this.employee_id = employee_id;
+029: 		this.first_name = first_name;
+030: 		this.last_name = last_name;
+031: 		this.email = email;
+032: 		this.phone_number = phone_number;
+033: 		this.hire_date = hire_date;
+034: 		this.job_id = job_id;
+035: 		this.salary = salary;
+036: 		this.commission_pct = commission_pct;
+037: 		this.manager_id = manager_id;
+038: 		this.department_id = department_id;
+039: 	}
+040: 
+041: 	public EmployeeDto(int employee_id, String first_name, String last_name, String email, String phone_number,
+042: 			Date hire_date) {
+043: 		super();
+044: 		this.employee_id = employee_id;
+045: 		this.first_name = first_name;
+046: 		this.last_name = last_name;
+047: 		this.email = email;
+048: 		this.phone_number = phone_number;
+049: 		this.hire_date = hire_date;
+050: 	}
+051: 
+052: 	@Override
+053: 	public String toString() {
+054: 		return "EmployeeDto [employee_id=" + employee_id + ", first_name=" + first_name + ", last_name=" + last_name
+055: 				+ ", email=" + email + ", phone_number=" + phone_number + ", hire_date=" + hire_date + ", job_id="
+056: 				+ job_id + ", salary=" + salary + ", commission_pct=" + commission_pct + ", manager_id=" + manager_id
+057: 				+ ", department_id=" + department_id + "]";
+058: 	}
+059:     
+060:    
+061:     public String getOrder2() {
+062: 		return order2;
+063: 	}
+064: 
+065: 	public void setOrder2(String order2) {
+066: 		this.order2=order2;
+067: 	}
+068: 
+069: 
+070: 	//employee_id
+071:     public int getEmployeeId() {
+072:         return this.employee_id;
+073:     }
+074: 
+075:     public void setEmployeeId(int employeeId){
+076:         this.employee_id=employeeId;
+077:     }
+078: 
+079:     //first_name
+080:     public String getFirstName () {
+081:         return first_name;
+082:     }
+083: 
+084:     public void setFirstName(String firstName){
+085:         this.first_name=firstName;
+086:     }
+087: 
+088:     //last_name
+089:     public String getLastName () {
+090:         return last_name;
+091:     }
+092: 
+093:     public void setLastName(String lastName){
+094:         this.last_name=lastName;
+095:     }
+096:     //email
+097:     public String getEmail () {
+098:         return email;
+099:     }
+100: 
+101:     public void setEmail (String email){
+102:         this.email=email;
+103:     }
+104: 
+105:     //phone_number
+106:     public String getPhoneNumber () {
+107:         return phone_number;
+108:     }
+109: 
+110:     public void setPhoneNumber (String phoneNumber){
+111:         this.phone_number=phoneNumber;
+112:     }
+113: 
+114:     //hire_date
+115:     public Date getHireDate(){
+116:         return hire_date;
+117:     }
+118: 
+119:     public void setHireDate(Date hireDate){
+120:         this.hire_date=hireDate;
+121:     }
+122: 
+123:     //job_id
+124:     public String getJobId () {
+125:         return job_id;
+126:     }
+127: 
+128:     public void setJobId (String jobId){
+129:         this.job_id=jobId;
+130:     }
+131: 
+132:     //salary
+133:     public double getSalary() {
+134:         return salary;
+135:     }
+136: 
+137:     public void setSalary(double salary){
+138:         this.salary=salary;
+139:     }
+140:     
+141:     //commission_pct
+142:     public double getCommissionPct() {
+143:         return commission_pct;
+144:     }
+145: 
+146:     public void setCommissionPct(double commissionPct){
+147:         this.commission_pct=commissionPct;
+148:     }
+149:     
+150:     //manager_id
+151:     public int getManagerId() {
+152:         return manager_id;
+153:     }
+154: 
+155:     public void setManagerId(int managerId){
+156:         this.manager_id=managerId;
+157:     }
+158: 
+159:     //department_id
+160:     public int getDepartmantId() {
+161:         return department_id;
+162:     }
+163: 
+164:     public void setDepartmantId(int departmentId){
+165:         this.department_id=departmentId;
+166:     }
+167: }

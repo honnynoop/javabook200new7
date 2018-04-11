@@ -1,0 +1,33 @@
+01: package kr.co.infopub.chapter.s199.common;
+02: 
+03: import java.io.Serializable;
+04: 
+05: public class JobsDto implements  Serializable{
+06: 	private String job_id;
+07: 	private String job_title;
+08: 	public JobsDto() {
+09: 		super();
+10: 	}
+11: 	public JobsDto(String job_id, String job_title) {
+12: 		super();
+13: 		this.job_id = job_id;
+14: 		this.job_title = job_title;
+15: 	}
+16: 	@Override
+17: 	public String toString() {
+18: 		return "JobsDto [job_id=" + job_id + ", job_title=" + job_title + "]";
+19: 	}
+20: 	public String getJob_id() {
+21: 		return job_id;
+22: 	}
+23: 	public void setJob_id(String job_id) {
+24: 		this.job_id = job_id;
+25: 	}
+26: 	public String getJob_title() {
+27: 		return job_title;
+28: 	}
+29: 	public void setJob_title(String job_title) {
+30: 		this.job_title = job_title;
+31: 	}
+32: 	
+33: }

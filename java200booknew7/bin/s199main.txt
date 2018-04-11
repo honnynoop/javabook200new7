@@ -1,0 +1,6 @@
+kr.co.infopub.chapter.s199.middle.ProtocolHandler
+이 TCP/IP Middle 서버입니다.
+
+195처럼 테스트는 
+
+s199.test는 3개의 메서드와 화면 테스트입니다.

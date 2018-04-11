@@ -1,0 +1,42 @@
+01: package kr.co.infopub.chapter.s199.common;
+02: 
+03: import java.io.Serializable;
+04: 
+05: public class DepCountDto implements  Serializable{
+06: 	private int count;
+07: 	private int department_id;
+08: 	private String department_name="NOTYET";
+09: 	public DepCountDto() {
+10: 		super();
+11: 	}
+12: 	public DepCountDto(int count, int department_id, String department_name) {
+13: 		super();
+14: 		this.count = count;
+15: 		this.department_id = department_id;
+16: 		this.department_name = department_name;
+17: 	}
+18: 	@Override
+19: 	public String toString() {
+20: 		return "DepCountDto [count=" + count + ", department_id=" + department_id + ", department_name="
+21: 				+ department_name + "]";
+22: 	}
+23: 	public int getCount() {
+24: 		return count;
+25: 	}
+26: 	public void setCount(int count) {
+27: 		this.count = count;
+28: 	}
+29: 	public int getDepartment_id() {
+30: 		return department_id;
+31: 	}
+32: 	public void setDepartment_id(int department_id) {
+33: 		this.department_id = department_id;
+34: 	}
+35: 	public String getDepartment_name() {
+36: 		return department_name;
+37: 	}
+38: 	public void setDepartment_name(String department_name) {
+39: 		this.department_name = department_name;
+40: 	}
+41: 	
+42: }

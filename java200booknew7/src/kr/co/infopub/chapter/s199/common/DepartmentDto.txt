@@ -1,0 +1,53 @@
+01: package kr.co.infopub.chapter.s199.common;
+02: 
+03: import java.io.Serializable;
+04: 
+05: public class DepartmentDto implements Serializable{
+06: 	
+07: 	private int department_id;
+08: 	private String department_name="NOTYET";
+09: 	private int manager_id;
+10: 	private int location_id;
+11: 	
+12: 	public DepartmentDto() {
+13: 		super();
+14: 	}
+15: 	public DepartmentDto(int department_id, String department_name, int manager_id, int location_id) {
+16: 		super();
+17: 		this.department_id = department_id;
+18: 		this.department_name = department_name;
+19: 		this.manager_id = manager_id;
+20: 		this.location_id = location_id;
+21: 	}
+22: 	@Override
+23: 	public String toString() {
+24: 		return "DepartmentDto [department_id=" + department_id + ", department_name=" + department_name
+25: 				+ ", manager_id=" + manager_id + ", location_id=" + location_id + "]";
+26: 	}
+27: 	public int getDepartment_id() {
+28: 		return department_id;
+29: 	}
+30: 	public void setDepartment_id(int department_id) {
+31: 		this.department_id = department_id;
+32: 	}
+33: 	public String getDepartment_name() {
+34: 		return department_name;
+35: 	}
+36: 	public void setDepartment_name(String department_name) {
+37: 		this.department_name = department_name;
+38: 	}
+39: 	public int getManager_id() {
+40: 		return manager_id;
+41: 	}
+42: 	public void setManager_id(int manager_id) {
+43: 		this.manager_id = manager_id;
+44: 	}
+45: 	public int getLocation_id() {
+46: 		return location_id;
+47: 	}
+48: 	public void setLocation_id(int location_id) {
+49: 		this.location_id = location_id;
+50: 	}
+51: 	  
+52: 	  
+53: }

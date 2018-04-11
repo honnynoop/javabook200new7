@@ -1,0 +1,47 @@
+01: package kr.co.infopub.chapter.s199.common;
+02: import java.io.*;
+03: public class HRMRequest implements Serializable {
+04:  private int commandValue;
+05:  private HRMResponse results;
+06:  private Serializable requestObject;
+07:  // CRUD 1234 - 상수이므로 대문자를 권장한다
+08:  public static final int findAllEmployees=2010;           // 1
+09:  public static final int findAllDepartments=2020;         // 2
+10:  public static final int findTreeManagerInEmployee=2030;  // 3
+11:  public static final int findEmployeesByDepartName=2040;  // 4
+12:  public static final int getEmployeesTotal=2510;          // 5
+13:  public static final int findAllDepartments2=2050;        // 6
+14:  public static final int findAllDepCounts=2060;           // 7
+15:  public static final int findAllJobs=2070;                // 8
+16:  public static final int findEmployeesByManagerId=2080;   // 9
+17:  public static final int findEmployeesByEmpId=2090;       // 10
+18:  public static final int findManagersByName=2100;         // 11
+19:  public static final int getTreeMaxLevel=2520;            // 12
+20:  public static final int findAfterAdd=2530;               // 13
+21:  public static final int addEmployee=1010;                // 14
+22:  public static final int updateEmployee=3010;             // 15
+23:  public static final int updateJobHistory=3020;           // 16
+24:  public static final int deleteEmployee=4010;             // 17
+25:  public static final int findEmployeeById=2110;           // 18
+26:  //생성자 setCommandValue()메소드 필요 없도록 생성자에서 처리
+27:  public HRMRequest (int comm) {
+28:     commandValue = comm;
+29:     results = new HRMResponse();
+30:  }
+31:  //처리할 액션의 타입(commandValue)을 리턴
+32:  public int getCommandValue() {
+33:     return commandValue;
+34:  }
+35:  // 직렬화 객체를 반환
+36:  public Serializable getRequestObject() {
+37: 	return requestObject;
+38:  }
+39:  // 직렬화 객체를 모두 받을 수 있다- 다형성
+40:  public void setRequestObject(Serializable requestObject) {
+41: 	this.requestObject = requestObject;
+42:  }
+43:  // 응답객체 
+44:  public HRMResponse getResult() {
+45:     return results;
+46:  }
+47: }
