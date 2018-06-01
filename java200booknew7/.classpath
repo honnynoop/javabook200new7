@@ -2,9 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="D:/java/javalisb/javax.json-api-1.1.2.jar"/>
-	<classpathentry kind="lib" path="D:/java/javalisb/jdom2-2.0.5.jar"/>
-	<classpathentry kind="lib" path="D:/java/javalisb/json-simple-1.1.1.jar"/>
-	<classpathentry kind="lib" path="D:/java/javalisb/ojdbc6.jar"/>
+	<classpathentry kind="lib" path="C:/Java/lib/javax.json-api-1.1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Java/lib/jdom2-2.0.5.jar"/>
+	<classpathentry kind="lib" path="C:/Java/lib/json-20160810.jar"/>
+	<classpathentry kind="lib" path="C:/Java/lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Java/lib/ojdbc6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

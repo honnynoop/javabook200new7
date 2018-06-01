@@ -1,0 +1,6 @@
+
+DataBase 본인의 것으로 수정하세요.
+ public static final String DRIVER="oracle.jdbc.driver.OracleDriver";
+ public static final String URLS="jdbc:oracle:thin:@127.0.0.1:1521:xe";
+ public static final String USER="hr";
+ public static final String PWD="hr";
